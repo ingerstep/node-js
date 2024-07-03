@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My books</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.21.6/dist/css/uikit.min.css" />
+</head>
+<body>
+    <section class="uk-container">
+        {% if user %}
+            <strong>User: {{ user.username }}. <a href="/">Log out</a></strong>
+            <h3> My books count: {{ user.books }}.</h3>
+            <p>
+                <button id="add-book" type="button">I've read another one!</button>
+            </p>
+        {% else %}
+            <form method="POST" action="/login" enctype="application/x-www-form-urlencoded">
+                <p>
+                    <input type="text" name="username" class="uk-input" />
+                </p>
+                <p>
+                    <input type="password" name="password" class="uk-input" />
+                </p>
+                {% if authError %}
+                    <div class="uk-alert uk-alert-danger">
+                        <p>Wrong username or password</p>
+                    </div>
+                {% endif %}
+                <p>
+                    <button class="uk-button uk-button-primary">Login</button>
+                </p>
+            </form>
+        {% endif %}
+    </section>
+    <script>
+        document.getElementById('add-book').addEventListener('click', () => {
+            fetch('/api/add-book', {method: 'post'}).then(() => {
+                location.reload()
+            })
+        })
+    </script>
+</body>
+</html>
