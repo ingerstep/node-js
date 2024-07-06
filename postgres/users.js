@@ -45,7 +45,7 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const data = pick(req.body, "name", "age"); //TODO: "country"
+    const data = pick(req.body, "name", "age", "country");
     const [id] = await knex("users").insert(data).returning("id");
 
     res
@@ -60,7 +60,7 @@ router.patch("/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const data = pick(req.body, "name", "age"); //TODO: "country"
+    const data = pick(req.body, "name", "age", "country");
     const updateCount = await knex("users").where({ id }).update(data);
 
     if (updateCount === 0) {
