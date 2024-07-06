@@ -1,5 +1,6 @@
 import e from "express";
 import { configDotenv } from "dotenv";
+import knex from "knex";
 import nunjucks from "nunjucks";
 import { nanoid } from "nanoid";
 import bodyParser from "body-parser";
@@ -7,36 +8,57 @@ import cookieParser from "cookie-parser";
 
 configDotenv();
 
+const db = knex({
+  client: "pg",
+  connection: {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+  },
+});
+
 const app = e();
 
-const DB = {
-  users: [{ _id: nanoid(), username: "admin", password: "qwerty", books: 0 }],
-  sessions: {},
-};
-
 const findUserByUsername = async (username) =>
-  DB.users.find((u) => u.username === username);
+  db("users")
+    .select()
+    .where({ username })
+    .limit(1)
+    .then((results) => results[0]);
 
 const findUserBySessionId = async (sessionId) => {
-  const userId = DB.sessions[sessionId];
+  const session = await db("sessions")
+    .select("user_id")
+    .where({ session_id: sessionId })
+    .limit(1)
+    .then((results) => results[0]);
 
-  if (!userId) {
+  if (!session) {
     return;
   }
 
-  return DB.users.find((u) => u._id === userId);
+  return db("users")
+    .select()
+    .where({ id: session.user_id })
+    .limit(1)
+    .then((results) => results[0]);
 };
 
 const createSession = async (userId) => {
   const sessionId = nanoid();
 
-  DB.sessions[sessionId] = userId;
+  await db("sessions").insert({
+    user_id: userId,
+    session_id: sessionId,
+  });
 
   return sessionId;
 };
 
 const deleteSession = async (sessionId) => {
-  delete DB.sessions[sessionId];
+  await db("sessions").where({ session_id: sessionId }).delete();
 };
 
 nunjucks.configure("views", {
@@ -75,14 +97,12 @@ app.post(
     const { username, password } = req.body;
     const user = await findUserByUsername(username);
 
-    //use hash
     if (!user || user.password !== password) {
       return res.redirect("/?authError=true");
     }
 
-    const sessionId = await createSession(user._id);
+    const sessionId = await createSession(user.id);
 
-    // use signed + secure(https)
     res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
   }
 );
@@ -92,9 +112,12 @@ app.post("/api/add-book", auth(), async (req, res) => {
     return res.sendStatus(401);
   }
 
-  const user = await findUserByUsername(req.user.username);
-  user.books += 1;
-  res.json({ books: user.books });
+  const [books] = await db("users")
+    .where({ id: req.user.id })
+    .update({ books: db.raw("books + 1") })
+    .returning("books");
+
+  res.json({ books });
 });
 
 app.get("/logout", auth(), async (req, res) => {
