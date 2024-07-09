@@ -1,23 +1,18 @@
 require("dotenv").config();
 
-const { MongoClient } = require("mongodb");
+const express = require("express")
 
-const client = new MongoClient(process.env.DB_URI);
+const app = express()
 
-(async () => {
-  try {
-    await client.connect();
+app.use(express.json())
+app.use("/api/users", require("./users"))
 
-    const db = client.db("users");
+app.use((err,req,res,next)=>{
+  res.status(500).send(err.message)
+})
 
-    const res = await db.collection("users").find({
-        age: {$gt: 16}
-    }).toArray();
+const port = process.env.PORT || 3000
 
-    console.log(res);
-  } catch (error) {
-    console.log(error);
-  }
-
-  await client.close();
-})();
+app.listen(port, () => {
+  console.log(`Listening on http://localhost:${port}`);
+})
