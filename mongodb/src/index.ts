@@ -1,13 +1,15 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+import express from "express";
+import type { Request, Response, NextFunction } from 'express'
 
-const express = require("express")
+dotenv.config();
 
 const app = express()
 
 app.use(express.json())
 app.use("/api/users", require("./users"))
 
-app.use((err,req,res,next)=>{
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send(err.message)
 })
 
