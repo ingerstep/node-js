@@ -122,4 +122,3 @@ router.delete("/:id", async (req: RequestWithDb, res: Response) => {
   }
 });
 
-export = router;
