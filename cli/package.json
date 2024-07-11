@@ -2,8 +2,9 @@
   "name": "cli",
   "version": "1.0.0",
   "main": "argv.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
+    "prebuild": "cross-env rimraf tmp && mkdirp tmp/out",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,6 +12,16 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "chalk": "^5.3.0",
+    "cli-table": "^0.3.11",
+    "cross-env": "^7.0.3",
+    "draftlog": "^1.0.13",
+    "inquirer": "^10.0.1",
+    "mkdirp": "^3.0.1",
+    "walk": "^2.3.15",
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1"
   }
 }
