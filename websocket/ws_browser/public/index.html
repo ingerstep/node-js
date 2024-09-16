@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="chat"></div>
+
+    <script type="module">
+      import { faker } from 'https://esm.sh/@faker-js/faker';
+      window.faker = faker;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        import('./client.js');
+      });
+    </script>
+  </body>
+</html>
