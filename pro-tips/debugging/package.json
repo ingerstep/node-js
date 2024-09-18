@@ -1,0 +1,22 @@
+{
+  "name": "debugging",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "debug:fib": "DEBUG=fibonacci node fs.js",
+    "debug:factor": "DEBUG=factorial node fs.js",
+    "debug:pare": "DEBUG=factorial,fibonacci node fs.js",
+    "debug:all": "DEBUG=* node fs.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "debug": "^4.3.7",
+    "express": "^4.21.0",
+    "lodash": "^4.17.21",
+    "node-fetch": "^3.3.2"
+  }
+}
